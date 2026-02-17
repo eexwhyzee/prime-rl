@@ -892,7 +892,7 @@ class OrchestratorConfig(BaseConfig):
 
     metrics_server: Annotated[
         MetricsServerConfig | None,
-        Field(description="Prometheus metrics server config. If set, exposes /metrics endpoint."),
+        Field(description="Prometheus metrics server config. If set, exposes /metrics endpoint for scraping."),
     ] = None
 
     @model_validator(mode="after")
