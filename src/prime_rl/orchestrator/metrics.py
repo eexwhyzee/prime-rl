@@ -13,7 +13,6 @@ class OrchestratorPrometheusMetrics:
         self.ckpt_step = Gauge("orchestrator_ckpt_step", "Current checkpoint step from trainer", registry=registry)
         self.total_tokens = Gauge("orchestrator_total_tokens", "Total tokens processed", registry=registry)
         self.total_samples = Gauge("orchestrator_total_samples", "Total samples processed", registry=registry)
-        self.throughput = Gauge("orchestrator_throughput_tokens_per_sec", "Tokens per second", registry=registry)
         self.last_step_ts = Gauge(
             "orchestrator_last_step_timestamp_seconds", "Unix timestamp of last step", registry=registry
         )
@@ -70,7 +69,6 @@ class OrchestratorPrometheusMetrics:
         self.ckpt_step.set(to_log.get("progress/ckpt_step", 0))
         self.total_tokens.set(to_log.get("progress/total_tokens", 0))
         self.total_samples.set(to_log.get("progress/total_samples", 0))
-        self.throughput.set(to_log.get("perf/throughput", 0))
         self.last_step_ts.set(time.time())
 
         self.step_duration.set(to_log.get("time/step", 0))

@@ -18,7 +18,6 @@ def test_orchestrator_metrics_update_and_cleanup():
             "progress/ckpt_step": 6,
             "progress/total_tokens": 120,
             "progress/total_samples": 12,
-            "perf/throughput": 55.0,
             "time/step": 1.5,
             "time/generate_completions": 0.7,
             "time/wait_for_ckpt": 0.2,
@@ -58,7 +57,6 @@ def test_orchestrator_metrics_update_and_cleanup():
     assert prom_sample_value(samples, "orchestrator_ckpt_step") == pytest.approx(6.0)
     assert prom_sample_value(samples, "orchestrator_total_tokens") == pytest.approx(120.0)
     assert prom_sample_value(samples, "orchestrator_total_samples") == pytest.approx(12.0)
-    assert prom_sample_value(samples, "orchestrator_throughput_tokens_per_sec") == pytest.approx(55.0)
     assert prom_sample_value(samples, "orchestrator_step_duration_seconds") == pytest.approx(1.5)
     assert prom_sample_value(samples, "orchestrator_generate_completions_duration_seconds") == pytest.approx(0.7)
     assert prom_sample_value(samples, "orchestrator_wait_for_ckpt_duration_seconds") == pytest.approx(0.2)
@@ -95,6 +93,7 @@ def test_orchestrator_metrics_update_and_cleanup():
     assert prom_sample_key("orchestrator_solve_none") not in samples
     assert prom_sample_key("orchestrator_env_stop_condition", env="env_a", stop_condition="max_turns") not in samples
     assert prom_sample_key("orchestrator_env_metric", env="env_a", metric="accuracy") not in samples
+    assert prom_sample_key("orchestrator_throughput_tokens_per_sec") not in samples
 
     metrics.update(
         {
