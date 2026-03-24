@@ -816,7 +816,7 @@ async def orchestrate(config: OrchestratorConfig):
         monitor.log(to_log, step=progress.step)
 
         if orchestrator_metrics is not None:
-            orchestrator_metrics.update(to_log, env_names=train_env_names)
+            orchestrator_metrics.update(to_log)
 
         # Log samples to monitor(s) if enabled
         subset_train_rollouts = random.sample(train_rollouts, min(8, len(train_rollouts)))
