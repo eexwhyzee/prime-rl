@@ -22,6 +22,7 @@ def test_trainer_metrics_update():
         mfu=10.0,
         entropy=0.1,
         mismatch_kl=0.05,
+        zero_grad_ratio=0.75,
     )
     update_end = time.time()
 
@@ -37,6 +38,7 @@ def test_trainer_metrics_update():
     assert prom_sample_value(samples, "trainer_entropy") == pytest.approx(0.1)
     assert prom_sample_value(samples, "trainer_mismatch_kl") == pytest.approx(0.05)
     assert prom_sample_value(samples, "trainer_kl_ent_ratio") == pytest.approx(0.5)
+    assert prom_sample_value(samples, "trainer_zero_grad_ratio") == pytest.approx(0.75)
     last_step_ts = prom_sample_value(samples, "trainer_last_step_timestamp_seconds")
     assert update_start <= last_step_ts <= update_end
 

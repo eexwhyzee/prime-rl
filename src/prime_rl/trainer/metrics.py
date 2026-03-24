@@ -39,6 +39,11 @@ class TrainerPrometheusMetrics:
             "trainer_mismatch_kl", "KL divergence between trainer and inference model", registry=registry
         )
         self.kl_ent_ratio = Gauge("trainer_kl_ent_ratio", "Ratio of mismatch KL to entropy", registry=registry)
+        self.zero_grad_ratio = Gauge(
+            "trainer_zero_grad_ratio",
+            "Fraction of tracked parameter elements with zero gradient",
+            registry=registry,
+        )
 
         # Aggregate run metrics
         self.runs_discovered = Gauge("trainer_runs_discovered", "Number of run folders discovered", registry=registry)
@@ -70,6 +75,7 @@ class TrainerPrometheusMetrics:
         mfu: float = 0.0,
         entropy: float = 0.0,
         mismatch_kl: float = 0.0,
+        zero_grad_ratio: float = 0.0,
     ) -> None:
         """Update step-level trainer metrics after a training step."""
         self.step.set(step)
@@ -81,6 +87,7 @@ class TrainerPrometheusMetrics:
         self.mfu.set(mfu)
         self.entropy.set(entropy)
         self.mismatch_kl.set(mismatch_kl)
+        self.zero_grad_ratio.set(zero_grad_ratio)
         if entropy > 0:
             self.kl_ent_ratio.set(mismatch_kl / entropy)
         self.last_step_ts.set(time.time())
