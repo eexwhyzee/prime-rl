@@ -20,6 +20,9 @@ def test_orchestrator_metrics_update_and_cleanup():
             "progress/total_samples": 12,
             "time/step": 1.5,
             "time/generate_completions": 0.7,
+            "generation_ms/all/min": 80.0,
+            "generation_ms/all/mean": 120.0,
+            "generation_ms/all/max": 180.0,
             "time/wait_for_ckpt": 0.2,
             "time/update_weights": 0.1,
             "scheduler/async_level": 2,
@@ -59,6 +62,9 @@ def test_orchestrator_metrics_update_and_cleanup():
     assert prom_sample_value(samples, "orchestrator_total_samples") == pytest.approx(12.0)
     assert prom_sample_value(samples, "orchestrator_step_duration_seconds") == pytest.approx(1.5)
     assert prom_sample_value(samples, "orchestrator_generate_completions_duration_seconds") == pytest.approx(0.7)
+    assert prom_sample_value(samples, "orchestrator_generation_duration_seconds", stat="min") == pytest.approx(0.08)
+    assert prom_sample_value(samples, "orchestrator_generation_duration_seconds", stat="mean") == pytest.approx(0.12)
+    assert prom_sample_value(samples, "orchestrator_generation_duration_seconds", stat="max") == pytest.approx(0.18)
     assert prom_sample_value(samples, "orchestrator_wait_for_ckpt_duration_seconds") == pytest.approx(0.2)
     assert prom_sample_value(samples, "orchestrator_update_weights_duration_seconds") == pytest.approx(0.1)
     assert prom_sample_value(samples, "orchestrator_async_level") == pytest.approx(2.0)

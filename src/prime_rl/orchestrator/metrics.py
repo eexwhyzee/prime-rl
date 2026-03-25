@@ -21,6 +21,12 @@ class OrchestratorPrometheusMetrics:
         self.generate_completions_duration = Gauge(
             "orchestrator_generate_completions_duration_seconds", "Generation duration", registry=registry
         )
+        self.generation_duration = Gauge(
+            "orchestrator_generation_duration_seconds",
+            "Per-rollout generation duration",
+            ["stat"],
+            registry=registry,
+        )
         self.wait_for_ckpt_duration = Gauge(
             "orchestrator_wait_for_ckpt_duration_seconds", "Checkpoint wait duration", registry=registry
         )
@@ -88,6 +94,11 @@ class OrchestratorPrometheusMetrics:
         self.off_policy_mean.set(to_log.get("off_policy_level/all/mean", 0))
 
         self.error_rate.set(to_log.get("error/all/mean", 0))
+
+        for stat in ["min", "mean", "max"]:
+            key = f"generation_ms/all/{stat}"
+            if key in to_log:
+                self.generation_duration.labels(stat=stat).set(to_log[key] / 1000)
 
         for stat in ["min", "mean", "med", "p90", "max"]:
             key = f"event_loop_lag/{stat}"
