@@ -37,10 +37,6 @@ def test_orchestrator_metrics_update_and_cleanup():
             "error/all/mean": 0.05,
             "event_loop_lag/mean": 0.02,
             "event_loop_lag/max": 0.05,
-            "worker/worker_a/pending": 3,
-            "worker/worker_b/pending": 1,
-            "worker_lag/worker_a/mean": 0.1,
-            "worker_lag/worker_b/max": 0.2,
             "pool/easy": 0.2,
             "pool/normal": 0.6,
             "pool/hard": 0.2,
@@ -79,14 +75,6 @@ def test_orchestrator_metrics_update_and_cleanup():
     assert prom_sample_value(samples, "orchestrator_error_rate") == pytest.approx(0.05)
     assert prom_sample_value(samples, "orchestrator_event_loop_lag_seconds", stat="mean") == pytest.approx(0.02)
     assert prom_sample_value(samples, "orchestrator_event_loop_lag_seconds", stat="max") == pytest.approx(0.05)
-    assert prom_sample_value(samples, "orchestrator_worker_pending_count", worker="worker_a") == pytest.approx(3.0)
-    assert prom_sample_value(samples, "orchestrator_worker_pending_count", worker="worker_b") == pytest.approx(1.0)
-    assert prom_sample_value(
-        samples, "orchestrator_worker_lag_seconds", worker="worker_a", stat="mean"
-    ) == pytest.approx(0.1)
-    assert prom_sample_value(
-        samples, "orchestrator_worker_lag_seconds", worker="worker_b", stat="max"
-    ) == pytest.approx(0.2)
     assert prom_sample_value(samples, "orchestrator_pool_ratio", pool="easy") == pytest.approx(0.2)
     assert prom_sample_value(samples, "orchestrator_pool_ratio", pool="normal") == pytest.approx(0.6)
     assert prom_sample_value(samples, "orchestrator_pool_ratio", pool="hard") == pytest.approx(0.2)
@@ -104,16 +92,12 @@ def test_orchestrator_metrics_update_and_cleanup():
     metrics.update(
         {
             "step": 8,
-            "worker/worker_a/pending": 2,
-            "worker_lag/worker_a/mean": 0.05,
+            "event_loop_lag/mean": 0.01,
         }
     )
 
     samples = prom_collect_samples(registry)
     assert prom_sample_value(samples, "orchestrator_step") == pytest.approx(8.0)
-    assert prom_sample_value(samples, "orchestrator_worker_pending_count", worker="worker_a") == pytest.approx(2.0)
-    assert prom_sample_value(
-        samples, "orchestrator_worker_lag_seconds", worker="worker_a", stat="mean"
-    ) == pytest.approx(0.05)
-    assert prom_sample_key("orchestrator_worker_pending_count", worker="worker_b") not in samples
-    assert prom_sample_key("orchestrator_worker_lag_seconds", worker="worker_b", stat="max") not in samples
+    assert prom_sample_value(samples, "orchestrator_event_loop_lag_seconds", stat="mean") == pytest.approx(0.01)
+    assert prom_sample_key("orchestrator_worker_pending_count", worker="worker_a") not in samples
+    assert prom_sample_key("orchestrator_worker_lag_seconds", worker="worker_a", stat="mean") not in samples

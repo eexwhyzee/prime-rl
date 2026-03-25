@@ -59,16 +59,7 @@ class OrchestratorPrometheusMetrics:
         self.event_loop_lag = Gauge(
             "orchestrator_event_loop_lag_seconds", "Event loop lag", ["stat"], registry=registry
         )
-        self.worker_pending = Gauge(
-            "orchestrator_worker_pending_count", "Pending requests per worker", ["worker"], registry=registry
-        )
-        self.worker_lag = Gauge(
-            "orchestrator_worker_lag_seconds", "Worker event loop lag", ["worker", "stat"], registry=registry
-        )
         self.pool_ratio = Gauge("orchestrator_pool_ratio", "Pool distribution", ["pool"], registry=registry)
-
-        self._known_workers: set[str] = set()
-        self._known_worker_lag: set[tuple[str, str]] = set()
 
     def update(self, to_log: dict[str, float]) -> None:
         self.step.set(to_log.get("step", 0))
@@ -104,30 +95,6 @@ class OrchestratorPrometheusMetrics:
             key = f"event_loop_lag/{stat}"
             if key in to_log:
                 self.event_loop_lag.labels(stat=stat).set(to_log[key])
-
-        current_workers = set()
-        current_worker_lag = set()
-        for key, value in to_log.items():
-            if key.startswith("worker/") and key.endswith("/pending"):
-                worker = key.replace("worker/", "", 1).replace("/pending", "", 1)
-                current_workers.add(worker)
-                self.worker_pending.labels(worker=worker).set(value)
-                continue
-
-            if key.startswith("worker_lag/"):
-                _, worker, stat = key.split("/", 2)
-                current_worker_lag.add((worker, stat))
-                self.worker_lag.labels(worker=worker, stat=stat).set(value)
-
-        removed_workers = self._known_workers - current_workers
-        for worker in removed_workers:
-            self.worker_pending.remove(worker)
-        self._known_workers = current_workers
-
-        removed_worker_lag = self._known_worker_lag - current_worker_lag
-        for worker, stat in removed_worker_lag:
-            self.worker_lag.remove(worker, stat)
-        self._known_worker_lag = current_worker_lag
 
         for pool in ["easy", "normal", "hard"]:
             key = f"pool/{pool}"
