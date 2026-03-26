@@ -21,6 +21,17 @@ class OrchestratorPrometheusMetrics:
         self.generate_completions_duration = Gauge(
             "orchestrator_generate_completions_duration_seconds", "Generation duration", registry=registry
         )
+        self.teacher_logprobs_duration = Gauge(
+            "orchestrator_teacher_logprobs_duration_seconds", "Teacher logprobs duration", registry=registry
+        )
+        self.save_ckpt_duration = Gauge(
+            "orchestrator_save_ckpt_duration_seconds", "Checkpoint save duration", registry=registry
+        )
+        self.parallel_preprocess_duration = Gauge(
+            "orchestrator_parallel_preprocess_duration_seconds",
+            "Parallel preprocess duration",
+            registry=registry,
+        )
         self.generation_duration = Gauge(
             "orchestrator_generation_duration_seconds",
             "Per-rollout generation duration",
@@ -69,6 +80,9 @@ class OrchestratorPrometheusMetrics:
 
         self.step_duration.set(to_log.get("time/step", 0))
         self.generate_completions_duration.set(to_log.get("time/generate_completions", 0))
+        self.teacher_logprobs_duration.set(to_log.get("time/teacher_logprobs", 0))
+        self.save_ckpt_duration.set(to_log.get("time/save_ckpt", 0))
+        self.parallel_preprocess_duration.set(to_log.get("time/parallel_preprocess", 0))
         self.wait_for_ckpt_duration.set(to_log.get("time/wait_for_ckpt", 0))
         self.update_weights_duration.set(to_log.get("time/update_weights", 0))
 
