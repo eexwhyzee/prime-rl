@@ -55,7 +55,6 @@ class OrchestratorPrometheusMetrics:
         self.off_policy_max = Gauge("orchestrator_off_policy_level_max", "Max off-policy steps", registry=registry)
         self.off_policy_mean = Gauge("orchestrator_off_policy_level_mean", "Mean off-policy steps", registry=registry)
 
-        self.error_rate = Gauge("orchestrator_error_rate", "Error rate across rollouts", registry=registry)
         self.event_loop_lag = Gauge(
             "orchestrator_event_loop_lag_seconds", "Event loop lag", ["stat"], registry=registry
         )
@@ -83,8 +82,6 @@ class OrchestratorPrometheusMetrics:
         self.off_policy_min.set(to_log.get("off_policy_level/all/min", 0))
         self.off_policy_max.set(to_log.get("off_policy_level/all/max", 0))
         self.off_policy_mean.set(to_log.get("off_policy_level/all/mean", 0))
-
-        self.error_rate.set(to_log.get("error/all/mean", 0))
 
         for stat in ["min", "mean", "max"]:
             key = f"generation_ms/all/{stat}"

@@ -72,7 +72,6 @@ def test_orchestrator_metrics_update_and_cleanup():
     assert prom_sample_value(samples, "orchestrator_off_policy_level_min") == pytest.approx(0.5)
     assert prom_sample_value(samples, "orchestrator_off_policy_level_max") == pytest.approx(3.0)
     assert prom_sample_value(samples, "orchestrator_off_policy_level_mean") == pytest.approx(1.5)
-    assert prom_sample_value(samples, "orchestrator_error_rate") == pytest.approx(0.05)
     assert prom_sample_value(samples, "orchestrator_event_loop_lag_seconds", stat="mean") == pytest.approx(0.02)
     assert prom_sample_value(samples, "orchestrator_event_loop_lag_seconds", stat="max") == pytest.approx(0.05)
     assert prom_sample_value(samples, "orchestrator_pool_ratio", pool="easy") == pytest.approx(0.2)
@@ -87,6 +86,7 @@ def test_orchestrator_metrics_update_and_cleanup():
     assert prom_sample_key("orchestrator_solve_none") not in samples
     assert prom_sample_key("orchestrator_env_stop_condition", env="env_a", stop_condition="max_turns") not in samples
     assert prom_sample_key("orchestrator_env_metric", env="env_a", metric="accuracy") not in samples
+    assert prom_sample_key("orchestrator_error_rate") not in samples
     assert prom_sample_key("orchestrator_throughput_tokens_per_sec") not in samples
 
     metrics.update(
