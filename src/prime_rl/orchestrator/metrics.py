@@ -38,6 +38,12 @@ class OrchestratorPrometheusMetrics:
             ["stat"],
             registry=registry,
         )
+        self.scoring_duration = Gauge(
+            "orchestrator_scoring_duration_seconds",
+            "Per-rollout scoring duration",
+            ["stat"],
+            registry=registry,
+        )
         self.wait_for_ckpt_duration = Gauge(
             "orchestrator_wait_for_ckpt_duration_seconds", "Checkpoint wait duration", registry=registry
         )
@@ -65,6 +71,19 @@ class OrchestratorPrometheusMetrics:
         self.off_policy_min = Gauge("orchestrator_off_policy_level_min", "Min off-policy steps", registry=registry)
         self.off_policy_max = Gauge("orchestrator_off_policy_level_max", "Max off-policy steps", registry=registry)
         self.off_policy_mean = Gauge("orchestrator_off_policy_level_mean", "Mean off-policy steps", registry=registry)
+        self.elastic_num_servers = Gauge(
+            "orchestrator_elastic_num_servers", "Number of elastic inference servers", registry=registry
+        )
+        self.elastic_num_ready_servers = Gauge(
+            "orchestrator_elastic_num_ready_servers",
+            "Number of ready elastic inference servers",
+            registry=registry,
+        )
+        self.elastic_desired_step = Gauge(
+            "orchestrator_elastic_desired_step",
+            "Desired checkpoint step for elastic inference servers",
+            registry=registry,
+        )
 
         self.event_loop_lag = Gauge(
             "orchestrator_event_loop_lag_seconds", "Event loop lag", ["stat"], registry=registry
@@ -96,11 +115,19 @@ class OrchestratorPrometheusMetrics:
         self.off_policy_min.set(to_log.get("off_policy_level/all/min", 0))
         self.off_policy_max.set(to_log.get("off_policy_level/all/max", 0))
         self.off_policy_mean.set(to_log.get("off_policy_level/all/mean", 0))
+        self.elastic_num_servers.set(to_log.get("elastic/num_servers", 0))
+        self.elastic_num_ready_servers.set(to_log.get("elastic/num_ready_servers", 0))
+        self.elastic_desired_step.set(to_log.get("elastic/desired_step", 0))
 
         for stat in ["min", "mean", "max"]:
             key = f"generation_ms/all/{stat}"
             if key in to_log:
                 self.generation_duration.labels(stat=stat).set(to_log[key] / 1000)
+
+        for stat in ["min", "mean", "max"]:
+            key = f"scoring_ms/all/{stat}"
+            if key in to_log:
+                self.scoring_duration.labels(stat=stat).set(to_log[key] / 1000)
 
         for stat in ["min", "mean", "med", "p90", "max"]:
             key = f"event_loop_lag/{stat}"

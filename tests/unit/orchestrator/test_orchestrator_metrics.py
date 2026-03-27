@@ -26,6 +26,9 @@ def test_orchestrator_metrics_update_and_cleanup():
             "generation_ms/all/min": 80.0,
             "generation_ms/all/mean": 120.0,
             "generation_ms/all/max": 180.0,
+            "scoring_ms/all/min": 30.0,
+            "scoring_ms/all/mean": 50.0,
+            "scoring_ms/all/max": 90.0,
             "time/wait_for_ckpt": 0.2,
             "time/update_weights": 0.1,
             "scheduler/async_level": 2,
@@ -37,6 +40,9 @@ def test_orchestrator_metrics_update_and_cleanup():
             "off_policy_level/all/min": 0.5,
             "off_policy_level/all/max": 3.0,
             "off_policy_level/all/mean": 1.5,
+            "elastic/num_servers": 6,
+            "elastic/num_ready_servers": 5,
+            "elastic/desired_step": 42,
             "error/all/mean": 0.05,
             "event_loop_lag/mean": 0.02,
             "event_loop_lag/max": 0.05,
@@ -67,6 +73,9 @@ def test_orchestrator_metrics_update_and_cleanup():
     assert prom_sample_value(samples, "orchestrator_generation_duration_seconds", stat="min") == pytest.approx(0.08)
     assert prom_sample_value(samples, "orchestrator_generation_duration_seconds", stat="mean") == pytest.approx(0.12)
     assert prom_sample_value(samples, "orchestrator_generation_duration_seconds", stat="max") == pytest.approx(0.18)
+    assert prom_sample_value(samples, "orchestrator_scoring_duration_seconds", stat="min") == pytest.approx(0.03)
+    assert prom_sample_value(samples, "orchestrator_scoring_duration_seconds", stat="mean") == pytest.approx(0.05)
+    assert prom_sample_value(samples, "orchestrator_scoring_duration_seconds", stat="max") == pytest.approx(0.09)
     assert prom_sample_value(samples, "orchestrator_wait_for_ckpt_duration_seconds") == pytest.approx(0.2)
     assert prom_sample_value(samples, "orchestrator_update_weights_duration_seconds") == pytest.approx(0.1)
     assert prom_sample_value(samples, "orchestrator_async_level") == pytest.approx(2.0)
@@ -78,6 +87,9 @@ def test_orchestrator_metrics_update_and_cleanup():
     assert prom_sample_value(samples, "orchestrator_off_policy_level_min") == pytest.approx(0.5)
     assert prom_sample_value(samples, "orchestrator_off_policy_level_max") == pytest.approx(3.0)
     assert prom_sample_value(samples, "orchestrator_off_policy_level_mean") == pytest.approx(1.5)
+    assert prom_sample_value(samples, "orchestrator_elastic_num_servers") == pytest.approx(6.0)
+    assert prom_sample_value(samples, "orchestrator_elastic_num_ready_servers") == pytest.approx(5.0)
+    assert prom_sample_value(samples, "orchestrator_elastic_desired_step") == pytest.approx(42.0)
     assert prom_sample_value(samples, "orchestrator_event_loop_lag_seconds", stat="mean") == pytest.approx(0.02)
     assert prom_sample_value(samples, "orchestrator_event_loop_lag_seconds", stat="max") == pytest.approx(0.05)
     assert prom_sample_value(samples, "orchestrator_pool_ratio", pool="easy") == pytest.approx(0.2)
